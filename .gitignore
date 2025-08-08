@@ -38,3 +38,7 @@ coverage.xml
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+body_small.json
+debug_local.py
+body_test.json

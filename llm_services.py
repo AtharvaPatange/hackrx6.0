@@ -37,32 +37,33 @@ def get_embedding(text: str):
 def get_answer_from_llm(question: str, context: str):
     """
     Uses Groq's LLaMA model to generate an answer based on a question and retrieved context.
-    Optimized for accuracy and concise responses.
+    Optimized for accuracy and detailed responses matching expected format.
     """
-    # Specific prompt targeting expected answer format
-    system_prompt = """You are an expert insurance analyst. Provide EXACT answers that match the expected format.
+    system_prompt = """You are an expert insurance policy analyst. Your task is to provide comprehensive, accurate answers based ONLY on the provided document context.
 
-For each question, provide the most accurate answer in ONE SENTENCE based on the document context.
+Instructions:
+- Read the context thoroughly and extract ALL relevant information for each question
+- Provide complete details including specific numbers, durations, percentages, conditions, and requirements
+- Include eligibility criteria, waiting periods, limits, exceptions, and sub-conditions
+- Use precise language and terminology from the document
+- Provide detailed explanations, not just brief answers
+- If the answer cannot be found in the context, state: "The specific information is not found in the provided document"
+- Be thorough and comprehensive - include all relevant policy terms
 
-Expected answer patterns:
-- Grace period: "A grace period of thirty days is provided for premium payment..."
-- Waiting period PED: "There is a waiting period of thirty-six (36) months..."
-- Maternity: "Yes, the policy covers maternity expenses, including childbirth..."
-- Cataract: "The policy has a specific waiting period of two (2) years..."
-- Organ donor: "Yes, the policy indemnifies the medical expenses..."
-- NCD: "A No Claim Discount of 5% on the base premium..."
-- Health check-ups: "Yes, the policy reimburses expenses for health check-ups..."
-- Hospital definition: "A hospital is defined as an institution with at least..."
-- AYUSH: "The policy covers medical expenses for inpatient treatment..."
-- Room rent: "Yes, for Plan A, the daily room rent is capped at..."
-
-If information is not found, say: "Not found in the provided document"."""
+Example detailed format:
+- For grace period: Include the exact number of days and what it applies to
+- For waiting periods: Include exact duration and what conditions apply
+- For coverage: Include what's covered, eligibility requirements, and any limitations
+- For definitions: Provide complete definition with all criteria mentioned"""
     
-    user_prompt = f"""Context: {context}
+    user_prompt = f"""Based on the following insurance policy document context, provide a comprehensive and accurate answer with all specific details:
+
+Context:
+{context}
 
 Question: {question}
 
-Provide the exact answer in one sentence:"""
+Provide a detailed answer with all specific numbers, conditions, requirements, and limitations mentioned in the context:"""
     
     try:
         chat_completion = groq_client.chat.completions.create(
@@ -71,9 +72,9 @@ Provide the exact answer in one sentence:"""
                 {"role": "user", "content": user_prompt}
             ],
             model=LLM_MODEL,
-            temperature=0.1,
-            max_tokens=150,   # Reduced for exact answers
-            timeout=10,        # Increased timeout for accuracy
+            temperature=0.0,  # Set to 0 for maximum accuracy and consistency
+            max_tokens=800,   # Significantly increased for detailed responses
+            timeout=15,       # Increased timeout for thorough analysis
         )
         
         return chat_completion.choices[0].message.content

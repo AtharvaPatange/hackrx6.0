@@ -38,10 +38,10 @@ def process_documents(urls: list):
             
             print("Text extracted from PDF pages.")
 
-            # 3. Chunk the extracted text for better coverage
+            # 3. Chunk the extracted text for better accuracy
             text_splitter = RecursiveCharacterTextSplitter(
-                chunk_size=350,   # Balanced chunk size
-                chunk_overlap=40,  # Balanced overlap
+                chunk_size=800,   # Increased for better context retention
+                chunk_overlap=100,  # Increased overlap to preserve context
                 length_function=len,
                 separators=["\n\n", "\n", ". ", " "]  # Simplified separators
             )

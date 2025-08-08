@@ -35,8 +35,8 @@ def process_single_question(question: str, question_num: int, total_questions: i
     print(f"Processing question {question_num}/{total_questions}: {question[:50]}...")
     question_start = time.time()
     
-    # a. Retrieve relevant context from Pinecone (reduced chunks)
-    context = query_pinecone(question, top_k=3)  # Reduced from 5 to 3 for speed
+    # a. Retrieve relevant context from Pinecone (increased for accuracy)
+    context = query_pinecone(question, top_k=8)  # Increased from 3 to 8 for better accuracy
     
     # b. Generate answer using LLM with the context
     answer = get_answer_from_llm(question, context)
