@@ -33,9 +33,10 @@ def process_document_from_url(url: str):
         # 3. Chunk the extracted text
         # Using RecursiveCharacterTextSplitter to split by paragraphs, then sentences, etc.
         text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=1000,
-            chunk_overlap=150, # Increased overlap for better context retention between chunks
-            length_function=len
+            chunk_size=800,  # Reduced chunk size for more granular chunks
+            chunk_overlap=200, # Increased overlap for better context retention between chunks
+            length_function=len,
+            separators=["\n\n", "\n", ". ", ", ", " ", ""]  # Better separators for insurance documents
         )
         chunks = text_splitter.split_text(full_text)
         print(f"Document was split into {len(chunks)} chunks.")
