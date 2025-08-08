@@ -35,13 +35,29 @@ def get_answer_from_llm(question: str, context: str):
     Uses Groq's LLaMA model to generate an answer based on a question and retrieved context.
     """
     system_prompt = """
-    You are an expert Question-Answering system. Your task is to answer the user's question based *only* on the provided text context.
-    Do not use any external knowledge.
-    If the context does not contain the answer, state that "The answer could not be found in the provided document."
-    Your answer must be concise and directly address the question.
+    You are an expert insurance policy analyst and question-answering system. Your task is to provide detailed, accurate answers based ONLY on the provided document context.
+
+    Instructions:
+    1. Read the context carefully and extract the most relevant information for each question
+    2. Provide comprehensive answers with specific details, numbers, and conditions mentioned in the document
+    3. Include waiting periods, percentages, limits, and specific requirements when mentioned
+    4. If multiple conditions apply, list them clearly
+    5. Use precise language from the document
+    6. If the answer cannot be found in the provided context, state: "The answer could not be found in the provided document."
+    7. Do not use external knowledge - only use information from the provided context
+    8. Be thorough but concise, focusing on the key details that directly answer the question
     """
     
-    user_prompt = f"Context:\n---\n{context}\n---\nQuestion: {question}"
+    user_prompt = f"""Based on the following document context, please answer the question with comprehensive details:
+
+Context:
+---
+{context}
+---
+
+Question: {question}
+
+Please provide a detailed answer based solely on the information in the context above."""
     
     try:
         chat_completion = groq_client.chat.completions.create(
@@ -50,8 +66,8 @@ def get_answer_from_llm(question: str, context: str):
                 {"role": "user", "content": user_prompt}
             ],
             model=LLM_MODEL,
-            temperature=0.0,
-            max_tokens=1000,
+            temperature=0.1,  # Slightly increased for more detailed responses
+            max_tokens=1500,  # Increased for longer, more detailed answers
         )
         
         return chat_completion.choices[0].message.content

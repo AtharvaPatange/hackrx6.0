@@ -70,7 +70,7 @@ def upsert_chunks(chunks: list[str]):
 
     print(f"Upserted {len(vectors_to_upsert)} chunks to Pinecone in namespace '{DEFAULT_NAMESPACE}'.")
 
-def query_pinecone(question: str, top_k: int = 5):
+def query_pinecone(question: str, top_k: int = 8):
     """Queries Pinecone to retrieve relevant text chunks for a question."""
     query_embedding = get_embedding(question)
     results = index.query(

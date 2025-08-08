@@ -29,7 +29,7 @@ def verify_token(credentials: HTTPAuthorizationCredentials = Depends(security)):
     return True
 
 # --- API Endpoint ---
-@app.post("/api/v1/hackrx/run", response_model=RunResponse)
+@app.post("/hackrx/run", response_model=RunResponse)
 async def run_submission(request: RunRequest, authorized: bool = Depends(verify_token)):
     """
     Main endpoint to process a document and answer questions.
