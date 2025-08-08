@@ -2,7 +2,10 @@
 
 from pinecone import Pinecone, ServerlessSpec
 from config import PINECONE_API_KEY, PINECONE_INDEX_NAME
-from llm_services import get_embedding
+from llm_services import get_embedding, get_embeddings_from_jina
+from document_processor import process_documents
+import hashlib
+import time
 
 # --- Initialize Pinecone ---
 pc = Pinecone(api_key=PINECONE_API_KEY)
@@ -31,46 +34,100 @@ index = init_pinecone()
 # We are adding namespace="" to the delete and upsert calls.
 DEFAULT_NAMESPACE = ""
 
-def upsert_chunks(chunks: list[str]):
-    """Generates embeddings and upserts chunks into Pinecone."""
-    # Clear previous document data from the default namespace (only if it exists)
-    try:
-        print(f"Clearing old data from namespace: '{DEFAULT_NAMESPACE}'")
-        index.delete(delete_all=True, namespace=DEFAULT_NAMESPACE)
-        print("Successfully cleared old data.")
-    except Exception as e:
-        if "Namespace not found" in str(e):
-            print(f"Namespace '{DEFAULT_NAMESPACE}' doesn't exist yet, skipping deletion.")
-        else:
-            print(f"Error clearing old data: {e}")
-            # Re-raise if it's not a namespace not found error
-            raise
-    
-    vectors_to_upsert = []
-    print(f"Generating embeddings for {len(chunks)} chunks...")
-    for i, chunk in enumerate(chunks):
-        if (i + 1) % 20 == 0:  # Print progress every 20 chunks (reduced frequency)
-            print(f"Processing chunk {i + 1}/{len(chunks)}")
-        embedding = get_embedding(chunk)
-        vectors_to_upsert.append({
-            "id": f"chunk_{i}",
-            "values": embedding,
-            "metadata": {"text": chunk}
-        })
+# Document cache to avoid reprocessing same documents
+processed_documents = set()
 
-    print("All embeddings generated. Starting upsert to Pinecone...")
-    # Upsert in larger batches for speed
-    batch_size = 200  # Increased batch size
-    for i in range(0, len(vectors_to_upsert), batch_size):
-        batch = vectors_to_upsert[i:i + batch_size]
+def get_document_hash(url: str) -> str:
+    """Generate a hash for the document URL to use as cache key."""
+    return hashlib.md5(url.encode()).hexdigest()[:8]
+
+def is_document_processed(url: str) -> bool:
+    """Check if document has already been processed."""
+    doc_hash = get_document_hash(url)
+    try:
+        # Check if any vectors exist with this document hash
+        stats = index.describe_index_stats()
+        if stats.total_vector_count > 0:
+            # Assume document is already processed if vectors exist
+            print(f"Document already processed (vectors exist: {stats.total_vector_count})")
+            return True
+    except Exception as e:
+        print(f"Error checking document status: {e}")
+    return False
+
+def upsert_chunks(vectors: list):
+    """Upserts pre-computed vectors into Pinecone."""
+    print(f"Upserting {len(vectors)} vectors to Pinecone")
+    # Upsert in batches for speed
+    batch_size = 100
+    for i in range(0, len(vectors), batch_size):
+        batch = vectors[i:i + batch_size]
         batch_num = i // batch_size + 1
-        total_batches = (len(vectors_to_upsert) + batch_size - 1) // batch_size
+        total_batches = (len(vectors) + batch_size - 1) // batch_size
         print(f"Upserting batch {batch_num}/{total_batches} ({len(batch)} vectors)")
         index.upsert(vectors=batch, namespace=DEFAULT_NAMESPACE)
+    print(f"Successfully upserted {len(vectors)} vectors")
 
-    print(f"Upserted {len(vectors_to_upsert)} chunks to Pinecone in namespace '{DEFAULT_NAMESPACE}'.")
+def process_and_store_documents(url: str):
+    """Process documents from URL and store in vector database with caching."""
+    print(f"Processing document from URL: {url}")
+    
+    # Check if document already processed
+    if is_document_processed(url):
+        print("Document already in vector store, skipping processing")
+        return
+    
+    # Clear existing vectors to avoid duplicates
+    try:
+        index.delete(delete_all=True, namespace=DEFAULT_NAMESPACE)
+        print("Cleared existing vectors")
+        time.sleep(1)  # Brief wait for deletion to complete
+    except Exception as e:
+        print(f"Warning: Could not clear existing vectors: {e}")
+    
+    # Process new document
+    documents = process_documents([url])
+    if not documents:
+        print("No documents processed")
+        return
+    
+    print(f"Processed {len(documents)} document chunks")
+    
+    # Generate embeddings and upsert (optimized batch processing)
+    doc_hash = get_document_hash(url)
+    vectors_to_upsert = []
+    
+    # Process in smaller batches for speed
+    batch_size = 10
+    for i in range(0, len(documents), batch_size):
+        batch = documents[i:i+batch_size]
+        texts = [doc.page_content for doc in batch]
+        
+        print(f"Generating embeddings for batch {i//batch_size + 1}/{(len(documents)-1)//batch_size + 1}")
+        embeddings = get_embeddings_from_jina(texts)
+        
+        for j, (doc, embedding) in enumerate(zip(batch, embeddings)):
+            vector_id = f"{doc_hash}_{i+j}"
+            vectors_to_upsert.append({
+                'id': vector_id,
+                'values': embedding,
+                'metadata': {
+                    'text': doc.page_content,
+                    'url': url,
+                    'doc_hash': doc_hash
+                }
+            })
+    
+    # Batch upsert all vectors
+    if vectors_to_upsert:
+        print(f"Upserting {len(vectors_to_upsert)} vectors to Pinecone")
+        upsert_chunks(vectors_to_upsert)
+        processed_documents.add(doc_hash)
+        print("Document processing completed and cached")
+    else:
+        print("No vectors to upsert")
 
-def query_pinecone(question: str, top_k: int = 8):
+def query_pinecone(question: str, top_k: int = 5):
     """Queries Pinecone to retrieve relevant text chunks for a question."""
     query_embedding = get_embedding(question)
     results = index.query(

@@ -4,52 +4,76 @@ import requests
 import io
 from pypdf import PdfReader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from vector_store import upsert_chunks
+from langchain.docstore.document import Document
 
+def process_documents(urls: list):
+    """
+    Downloads PDFs from URLs, extracts text, and returns Document objects.
+    Optimized for speed.
+    """
+    all_documents = []
+    
+    for url in urls:
+        print(f"Processing document from URL: {url}")
+        try:
+            # 1. Download the PDF content with aggressive timeout
+            response = requests.get(url, timeout=10)  # Reduced timeout
+            response.raise_for_status()
+            print("Document downloaded successfully.")
+
+            # 2. Read the PDF from the in-memory content
+            pdf_file = io.BytesIO(response.content)
+            reader = PdfReader(pdf_file)
+            
+            full_text = ""
+            # Limit pages for speed (first 20 pages only in emergency)
+            max_pages = min(len(reader.pages), 50)  # Limit for speed
+            for page_num in range(max_pages):
+                page_text = reader.pages[page_num].extract_text()
+                if page_text:
+                    full_text += page_text + "\n"
+            
+            if max_pages < len(reader.pages):
+                print(f"Warning: Processing only first {max_pages} pages for speed optimization")
+            
+            print("Text extracted from PDF pages.")
+
+            # 3. Chunk the extracted text aggressively for speed
+            text_splitter = RecursiveCharacterTextSplitter(
+                chunk_size=500,   # Smaller chunks for faster processing
+                chunk_overlap=50,  # Reduced overlap
+                length_function=len,
+                separators=["\n\n", "\n", ". ", " "]  # Simplified separators
+            )
+            chunks = text_splitter.split_text(full_text)
+            print(f"Document split into {len(chunks)} chunks.")
+
+            # Convert to Document objects
+            for i, chunk in enumerate(chunks):
+                doc = Document(
+                    page_content=chunk,
+                    metadata={"source": url, "chunk": i}
+                )
+                all_documents.append(doc)
+
+        except requests.exceptions.RequestException as e:
+            print(f"Error downloading document from {url}: {e}")
+            raise
+        except Exception as e:
+            print(f"Unexpected error processing document from {url}: {e}")
+            raise
+    
+    return all_documents
+
+# Keep the original function for backward compatibility but optimize it
 def process_document_from_url(url: str):
     """
-    Downloads a PDF from a URL, extracts text, chunks it, and triggers the upsert to Pinecone.
+    Legacy function - use process_documents instead for better performance.
     """
-    print(f"Downloading document from URL: {url}")
-    try:
-        # 1. Download the PDF content
-        response = requests.get(url, timeout=15) # Reduced timeout for faster failure
-        response.raise_for_status()  # This will raise an error for bad responses (4xx or 5xx)
-        print("Document downloaded successfully.")
-
-        # 2. Read the PDF from the in-memory content
-        pdf_file = io.BytesIO(response.content)
-        reader = PdfReader(pdf_file)
-        
-        full_text = ""
-        for page in reader.pages:
-            # Extract text and handle cases where a page might be empty
-            page_text = page.extract_text()
-            if page_text:
-                full_text += page_text + "\n"
-        
-        print("Text extracted from all pages.")
-
-        # 3. Chunk the extracted text
-        # Using RecursiveCharacterTextSplitter to split by paragraphs, then sentences, etc.
-        text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=600,  # Further reduced for faster processing
-            chunk_overlap=100, # Reduced overlap for speed
-            length_function=len,
-            separators=["\n\n", "\n", ". ", ", ", " ", ""]  # Better separators for insurance documents
-        )
-        chunks = text_splitter.split_text(full_text)
-        print(f"Document was split into {len(chunks)} chunks.")
-
-        # 4. Upsert the chunks into the vector store (Pinecone)
-        if chunks:
-            upsert_chunks(chunks)
-        else:
-            print("Warning: No text chunks were generated from the document.")
-
-    except requests.exceptions.RequestException as e:
-        print(f"Error downloading the document: {e}")
-        raise
-    except Exception as e:
-        print(f"An unexpected error occurred during document processing: {e}")
-        raise
+    documents = process_documents([url])
+    # Convert back to text chunks for legacy compatibility
+    chunks = [doc.page_content for doc in documents]
+    
+    # Use the optimized vector store function
+    from vector_store import process_and_store_documents
+    process_and_store_documents(url)
