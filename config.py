@@ -14,5 +14,5 @@ API_AUTH_TOKEN = os.getenv("API_AUTH_TOKEN", "b3c00e5d9170676e30277fe0ad6d201ffd
 PINECONE_INDEX_NAME = "hackrx-jina-index"
 
 # --- Model Settings (Using Groq with LLaMA + Jina embeddings) ---
-LLM_MODEL = "llama-3.1-8b-instant"  # Latest LLaMA model on Groq
+LLM_MODEL = "llama-3.3-70b-versatile"  # Latest LLaMA model on Groq
 EMBEDDING_MODEL = "jina-embeddings-v2-base-en"  # Jina embedding model (768 dimensions)

@@ -17,7 +17,7 @@ def process_documents(urls: list):
         print(f"Processing document from URL: {url}")
         try:
             # 1. Download the PDF content with aggressive timeout
-            response = requests.get(url, timeout=10)  # Reduced timeout
+            response = requests.get(url, timeout=8)  # Further reduced timeout
             response.raise_for_status()
             print("Document downloaded successfully.")
 
@@ -26,8 +26,8 @@ def process_documents(urls: list):
             reader = PdfReader(pdf_file)
             
             full_text = ""
-            # Limit pages for speed (first 20 pages only in emergency)
-            max_pages = min(len(reader.pages), 50)  # Limit for speed
+            # Limit pages for speed (first 25 pages for balance)
+            max_pages = min(len(reader.pages), 25)  # Reduced for speed while maintaining quality
             for page_num in range(max_pages):
                 page_text = reader.pages[page_num].extract_text()
                 if page_text:
@@ -38,10 +38,10 @@ def process_documents(urls: list):
             
             print("Text extracted from PDF pages.")
 
-            # 3. Chunk the extracted text aggressively for speed
+            # 3. Chunk the extracted text for better coverage
             text_splitter = RecursiveCharacterTextSplitter(
-                chunk_size=500,   # Smaller chunks for faster processing
-                chunk_overlap=50,  # Reduced overlap
+                chunk_size=350,   # Balanced chunk size
+                chunk_overlap=40,  # Balanced overlap
                 length_function=len,
                 separators=["\n\n", "\n", ". ", " "]  # Simplified separators
             )

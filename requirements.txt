@@ -8,3 +8,4 @@ pinecone
 pypdf
 requests
 pydantic
+httpx

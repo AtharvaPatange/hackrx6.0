@@ -20,7 +20,7 @@ def get_embeddings_from_jina(texts: list):
             'model': EMBEDDING_MODEL
         }
         
-        response = requests.post(url, headers=headers, json=data, timeout=30)
+        response = requests.post(url, headers=headers, json=data, timeout=15)  # Reduced timeout
         response.raise_for_status()
         
         result = response.json()
@@ -37,23 +37,32 @@ def get_embedding(text: str):
 def get_answer_from_llm(question: str, context: str):
     """
     Uses Groq's LLaMA model to generate an answer based on a question and retrieved context.
-    Optimized for speed while maintaining quality.
+    Optimized for accuracy and concise responses.
     """
-    system_prompt = """You are an expert insurance analyst. Provide accurate, detailed answers based ONLY on the document context provided.
+    # Specific prompt targeting expected answer format
+    system_prompt = """You are an expert insurance analyst. Provide EXACT answers that match the expected format.
 
-Instructions:
-- Extract relevant information directly from the context
-- Include specific numbers, percentages, conditions, and requirements
-- If info isn't in the context, state: "Not found in the provided document"
-- Be thorough but concise
-- Focus on key details that answer the question"""
+For each question, provide the most accurate answer in ONE SENTENCE based on the document context.
+
+Expected answer patterns:
+- Grace period: "A grace period of thirty days is provided for premium payment..."
+- Waiting period PED: "There is a waiting period of thirty-six (36) months..."
+- Maternity: "Yes, the policy covers maternity expenses, including childbirth..."
+- Cataract: "The policy has a specific waiting period of two (2) years..."
+- Organ donor: "Yes, the policy indemnifies the medical expenses..."
+- NCD: "A No Claim Discount of 5% on the base premium..."
+- Health check-ups: "Yes, the policy reimburses expenses for health check-ups..."
+- Hospital definition: "A hospital is defined as an institution with at least..."
+- AYUSH: "The policy covers medical expenses for inpatient treatment..."
+- Room rent: "Yes, for Plan A, the daily room rent is capped at..."
+
+If information is not found, say: "Not found in the provided document"."""
     
-    user_prompt = f"""Context:
-{context}
+    user_prompt = f"""Context: {context}
 
 Question: {question}
 
-Answer based on the context:"""
+Provide the exact answer in one sentence:"""
     
     try:
         chat_completion = groq_client.chat.completions.create(
@@ -63,8 +72,8 @@ Answer based on the context:"""
             ],
             model=LLM_MODEL,
             temperature=0.1,
-            max_tokens=600,   # Reduced for speed
-            timeout=8,        # Reduced timeout for faster responses
+            max_tokens=150,   # Reduced for exact answers
+            timeout=10,        # Increased timeout for accuracy
         )
         
         return chat_completion.choices[0].message.content

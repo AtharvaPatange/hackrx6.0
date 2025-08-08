@@ -48,8 +48,8 @@ def is_document_processed(url: str) -> bool:
         # Check if any vectors exist with this document hash
         stats = index.describe_index_stats()
         if stats.total_vector_count > 0:
-            # Assume document is already processed if vectors exist
-            print(f"Document already processed (vectors exist: {stats.total_vector_count})")
+            # Use cached document for speed
+            print(f"Document already processed (vectors exist: {stats.total_vector_count}), using cached version")
             return True
     except Exception as e:
         print(f"Error checking document status: {e}")
@@ -58,8 +58,8 @@ def is_document_processed(url: str) -> bool:
 def upsert_chunks(vectors: list):
     """Upserts pre-computed vectors into Pinecone."""
     print(f"Upserting {len(vectors)} vectors to Pinecone")
-    # Upsert in batches for speed
-    batch_size = 100
+    # Upsert in larger batches for speed
+    batch_size = 200  # Increased batch size
     for i in range(0, len(vectors), batch_size):
         batch = vectors[i:i + batch_size]
         batch_num = i // batch_size + 1
@@ -81,7 +81,7 @@ def process_and_store_documents(url: str):
     try:
         index.delete(delete_all=True, namespace=DEFAULT_NAMESPACE)
         print("Cleared existing vectors")
-        time.sleep(1)  # Brief wait for deletion to complete
+        time.sleep(0.5)  # Reduced wait time
     except Exception as e:
         print(f"Warning: Could not clear existing vectors: {e}")
     
@@ -97,8 +97,8 @@ def process_and_store_documents(url: str):
     doc_hash = get_document_hash(url)
     vectors_to_upsert = []
     
-    # Process in smaller batches for speed
-    batch_size = 10
+    # Process in larger batches for speed
+    batch_size = 20  # Increased batch size
     for i in range(0, len(documents), batch_size):
         batch = documents[i:i+batch_size]
         texts = [doc.page_content for doc in batch]
@@ -127,7 +127,7 @@ def process_and_store_documents(url: str):
     else:
         print("No vectors to upsert")
 
-def query_pinecone(question: str, top_k: int = 5):
+def query_pinecone(question: str, top_k: int = 10):  # Increased to 10 for better context
     """Queries Pinecone to retrieve relevant text chunks for a question."""
     query_embedding = get_embedding(question)
     results = index.query(
