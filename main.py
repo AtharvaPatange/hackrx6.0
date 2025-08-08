@@ -1,12 +1,14 @@
 # File: main.py
 
-from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi import FastAPI, Depends, HTTPException, status, BackgroundTasks
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from schemas import RunRequest, RunResponse
 from config import API_AUTH_TOKEN
 from document_processor import process_document_from_url
 from vector_store import query_pinecone
 from llm_services import get_answer_from_llm
+import asyncio
+import time
 
 # --- App Initialization ---
 app = FastAPI(
@@ -34,28 +36,61 @@ async def run_submission(request: RunRequest, authorized: bool = Depends(verify_
     """
     Main endpoint to process a document and answer questions.
     """
+    start_time = time.time()
     try:
-        # 1. Process the document from the URL
-        # This will download, parse, chunk, embed, and store the document in Pinecone
+        print(f"Starting processing at {time.strftime('%H:%M:%S')}")
+        
+        # 1. Process the document from the URL (with timeout)
+        print("Step 1: Processing document...")
+        process_start = time.time()
         process_document_from_url(request.documents)
+        process_time = time.time() - process_start
+        print(f"Document processing completed in {process_time:.2f} seconds")
+        
+        # Check if we're approaching timeout
+        elapsed = time.time() - start_time
+        if elapsed > 25:  # Leave 5 seconds buffer
+            raise HTTPException(
+                status_code=status.HTTP_408_REQUEST_TIMEOUT,
+                detail="Processing timeout - document processing took too long"
+            )
 
-        # 2. Loop through questions and generate answers
+        # 2. Loop through questions and generate answers (with timeout)
+        print("Step 2: Generating answers...")
         all_answers = []
-        for question in request.questions:
-            print(f"\nProcessing question: {question}")
+        for i, question in enumerate(request.questions):
+            # Check timeout for each question
+            elapsed = time.time() - start_time
+            if elapsed > 28:  # 2 seconds buffer
+                print(f"Timeout reached after processing {i} questions")
+                # Return partial results
+                remaining = len(request.questions) - i
+                all_answers.extend(["Processing timeout - unable to complete all questions"] * remaining)
+                break
+                
+            print(f"Processing question {i+1}/{len(request.questions)}: {question[:50]}...")
+            question_start = time.time()
             
             # a. Retrieve relevant context from Pinecone
-            context = query_pinecone(question)
+            context = query_pinecone(question, top_k=5)  # Reduced from 8 to 5
             
             # b. Generate answer using LLM with the context
             answer = get_answer_from_llm(question, context)
             all_answers.append(answer)
-            print(f"Generated Answer: {answer}")
+            
+            question_time = time.time() - question_start
+            print(f"Question {i+1} completed in {question_time:.2f} seconds")
+        
+        total_time = time.time() - start_time
+        print(f"Total processing time: {total_time:.2f} seconds")
         
         return RunResponse(answers=all_answers)
 
+    except HTTPException:
+        raise
     except Exception as e:
-        print(f"An error occurred: {e}")
+        total_time = time.time() - start_time
+        print(f"Error occurred after {total_time:.2f} seconds: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"An internal error occurred: {str(e)}"

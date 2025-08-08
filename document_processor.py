@@ -13,7 +13,7 @@ def process_document_from_url(url: str):
     print(f"Downloading document from URL: {url}")
     try:
         # 1. Download the PDF content
-        response = requests.get(url, timeout=30) # Added a timeout for safety
+        response = requests.get(url, timeout=15) # Reduced timeout for faster failure
         response.raise_for_status()  # This will raise an error for bad responses (4xx or 5xx)
         print("Document downloaded successfully.")
 
@@ -33,8 +33,8 @@ def process_document_from_url(url: str):
         # 3. Chunk the extracted text
         # Using RecursiveCharacterTextSplitter to split by paragraphs, then sentences, etc.
         text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=800,  # Reduced chunk size for more granular chunks
-            chunk_overlap=200, # Increased overlap for better context retention between chunks
+            chunk_size=600,  # Further reduced for faster processing
+            chunk_overlap=100, # Reduced overlap for speed
             length_function=len,
             separators=["\n\n", "\n", ". ", ", ", " ", ""]  # Better separators for insurance documents
         )
