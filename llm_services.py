@@ -67,7 +67,8 @@ Please provide a detailed answer based solely on the information in the context 
             ],
             model=LLM_MODEL,
             temperature=0.1,  # Slightly increased for more detailed responses
-            max_tokens=1500,  # Increased for longer, more detailed answers
+            max_tokens=800,   # Reduced for faster responses
+            timeout=10,       # 10 second timeout per question
         )
         
         return chat_completion.choices[0].message.content

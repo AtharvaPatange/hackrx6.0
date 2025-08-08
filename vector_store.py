@@ -49,7 +49,7 @@ def upsert_chunks(chunks: list[str]):
     vectors_to_upsert = []
     print(f"Generating embeddings for {len(chunks)} chunks...")
     for i, chunk in enumerate(chunks):
-        if (i + 1) % 10 == 0:  # Print progress every 10 chunks
+        if (i + 1) % 20 == 0:  # Print progress every 20 chunks (reduced frequency)
             print(f"Processing chunk {i + 1}/{len(chunks)}")
         embedding = get_embedding(chunk)
         vectors_to_upsert.append({
@@ -59,8 +59,8 @@ def upsert_chunks(chunks: list[str]):
         })
 
     print("All embeddings generated. Starting upsert to Pinecone...")
-    # Upsert in batches to the default namespace
-    batch_size = 100
+    # Upsert in larger batches for speed
+    batch_size = 200  # Increased batch size
     for i in range(0, len(vectors_to_upsert), batch_size):
         batch = vectors_to_upsert[i:i + batch_size]
         batch_num = i // batch_size + 1
