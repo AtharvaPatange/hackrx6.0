@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: sih-groundwater-api
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn sih:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: GROQ_API_KEY
+        sync: false
+      - key: JINA_API_KEY
+        sync: false
+      - key: PINECONE_API_KEY
+        sync: false
+      - key: PINECONE_INDEX_NAME
+        value: hackrx-jina-index
+      - key: PINECONE_ENV
+        value: us-east-1
+      - key: EMBEDDING_MODEL
+        value: jina-embeddings-v2-base-en
+      - key: LLM_MODEL
+        value: llama-3.3-70b-versatile
+      - key: DEFAULT_TOP_K
+        value: 6
+      - key: VECTOR_DIM
+        value: 768

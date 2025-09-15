@@ -1,4 +1,4 @@
-# sih.py - INGRES RAG Backend for Groundwater Resources
+
 import os
 import uuid
 import time
@@ -81,17 +81,14 @@ app = FastAPI(
 )
 
 from fastapi.middleware.cors import CORSMiddleware
-app = FastAPI()
-
-
 
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # In production, specify your frontend domain
+    allow_origins=["*"],  # Allows all origins for testing
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["*"],  # Allows all HTTP methods
+    allow_headers=["*"],  # Allows all headers
 )
 # Authentication
 security = HTTPBearer()
