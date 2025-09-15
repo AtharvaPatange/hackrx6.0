@@ -1,0 +1,172 @@
+{
+  "test_summary": {
+    "timestamp": "2025-09-04T14:37:11.281475",
+    "total_tests": 15,
+    "successful_tests": 14,
+    "failed_tests": 1,
+    "success_rate": 93.33333333333333
+  },
+  "test_results": [
+    {
+      "query": "Which state in India has the highest number of groundwater wells?",
+      "category": "Factual - Wells",
+      "success": false,
+      "error": "HTTP 500: {\"detail\":\"Embedding API request failed: ('Connection aborted.', ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None))\"}",
+      "timestamp": "2025-09-04T14:34:43.636294"
+    },
+    {
+      "query": "What percentage of global groundwater does India consume?",
+      "category": "Factual - Statistics",
+      "success": true,
+      "response_time": 8.04539155960083,
+      "language_detected": "en",
+      "total_sources": 5,
+      "answer_length": 1793,
+      "query_id": "1c6e6f4d-ca22-4df5-af8e-681c0a7a5884",
+      "timestamp": "2025-09-04T14:34:52.684964"
+    },
+    {
+      "query": "What is CGWB and what are its main responsibilities?",
+      "category": "Factual - Organizations",
+      "success": true,
+      "response_time": 7.17881441116333,
+      "language_detected": "en",
+      "total_sources": 5,
+      "answer_length": 2279,
+      "query_id": "fbd84508-8d23-489e-9e7e-b9c18e8e5b4d",
+      "timestamp": "2025-09-04T14:35:00.866862"
+    },
+    {
+      "query": "What are the main groundwater problems in Maharashtra?",
+      "category": "Regional - Maharashtra",
+      "success": true,
+      "response_time": 11.65605115890503,
+      "language_detected": "en",
+      "total_sources": 5,
+      "answer_length": 2560,
+      "query_id": "f949853b-d836-478e-aab6-a630645b05e3",
+      "timestamp": "2025-09-04T14:35:13.537759"
+    },
+    {
+      "query": "Describe the groundwater situation in Rajasthan desert regions",
+      "category": "Regional - Rajasthan",
+      "success": true,
+      "response_time": 8.31190037727356,
+      "language_detected": "en",
+      "total_sources": 5,
+      "answer_length": 3002,
+      "query_id": "c1ae6e3e-6f5e-4e57-8807-368f4c8237ab",
+      "timestamp": "2025-09-04T14:35:22.853065"
+    },
+    {
+      "query": "What water conservation techniques are used in Gujarat?",
+      "category": "Regional - Gujarat",
+      "success": true,
+      "response_time": 18.86462640762329,
+      "language_detected": "en",
+      "total_sources": 5,
+      "answer_length": 2494,
+      "query_id": "5080d13b-27ef-4f3e-8f6b-41d8585144fe",
+      "timestamp": "2025-09-04T14:35:42.722792"
+    },
+    {
+      "query": "Which regions face the most severe groundwater over-exploitation?",
+      "category": "Regional - Crisis Areas",
+      "success": true,
+      "response_time": 8.831202745437622,
+      "language_detected": "en",
+      "total_sources": 5,
+      "answer_length": 2307,
+      "query_id": "fa537fec-bdac-4a74-8a9c-51a3f01fa040",
+      "timestamp": "2025-09-04T14:35:52.555778"
+    },
+    {
+      "query": "What are the different types of aquifers found in India?",
+      "category": "Technical - Aquifers",
+      "success": true,
+      "response_time": 9.540673732757568,
+      "language_detected": "en",
+      "total_sources": 5,
+      "answer_length": 1959,
+      "query_id": "760ae764-f1cb-4338-8b40-e98c599b3258",
+      "timestamp": "2025-09-04T14:36:03.100817"
+    },
+    {
+      "query": "How deep is groundwater typically found in different regions?",
+      "category": "Technical - Depth",
+      "success": true,
+      "response_time": 10.978629112243652,
+      "language_detected": "en",
+      "total_sources": 5,
+      "answer_length": 2267,
+      "query_id": "b5010e17-d767-49da-9693-74af4fc02e63",
+      "timestamp": "2025-09-04T14:36:15.080860"
+    },
+    {
+      "query": "What are the main groundwater quality issues in India?",
+      "category": "Technical - Quality",
+      "success": true,
+      "response_time": 8.315349817276001,
+      "language_detected": "en",
+      "total_sources": 5,
+      "answer_length": 1905,
+      "query_id": "6d4ee50d-5905-4089-87a8-769fd4ccade1",
+      "timestamp": "2025-09-04T14:36:24.398538"
+    },
+    {
+      "query": "What government schemes exist for groundwater management?",
+      "category": "Policy - Schemes",
+      "success": true,
+      "response_time": 7.91720175743103,
+      "language_detected": "en",
+      "total_sources": 5,
+      "answer_length": 2412,
+      "query_id": "a28c8931-9f07-4e9a-9795-3080bdce6596",
+      "timestamp": "2025-09-04T14:36:33.318873"
+    },
+    {
+      "query": "What are the traditional water harvesting methods in India?",
+      "category": "Policy - Traditional Methods",
+      "success": true,
+      "response_time": 10.660850286483765,
+      "language_detected": "en",
+      "total_sources": 5,
+      "answer_length": 2645,
+      "query_id": "8bc7f4c0-fe4a-4997-bca0-33e2c5c4836c",
+      "timestamp": "2025-09-04T14:36:44.981271"
+    },
+    {
+      "query": "What regulations exist for groundwater extraction?",
+      "category": "Policy - Regulations",
+      "success": true,
+      "response_time": 8.10654902458191,
+      "language_detected": "en",
+      "total_sources": 5,
+      "answer_length": 2011,
+      "query_id": "9e100ba2-3edf-4e12-a3f9-e5282f2c4027",
+      "timestamp": "2025-09-04T14:36:54.089906"
+    },
+    {
+      "query": "भारत में भूजल की मुख्य समस्याएं क्या हैं?",
+      "category": "Hindi - Problems",
+      "success": true,
+      "response_time": 7.091156482696533,
+      "language_detected": "hi",
+      "total_sources": 5,
+      "answer_length": 731,
+      "query_id": "996f9a3e-7cf3-4741-94f0-9464b53f4a0d",
+      "timestamp": "2025-09-04T14:37:02.188246"
+    },
+    {
+      "query": "भारत में पारंपरिक जल संचयन के तरीके क्या हैं?",
+      "category": "Hindi - Traditional Methods",
+      "success": true,
+      "response_time": 7.075865268707275,
+      "language_detected": "hi",
+      "total_sources": 5,
+      "answer_length": 801,
+      "query_id": "f0f6b8ed-c9db-468c-8c51-4acb6dfb8fa2",
+      "timestamp": "2025-09-04T14:37:10.275954"
+    }
+  ]
+}

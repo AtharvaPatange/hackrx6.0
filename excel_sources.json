@@ -1,0 +1,90 @@
+{
+  "documents": [
+    {
+      "url": "https://example.com/maharashtra-groundwater-data.xlsx",
+      "title": "Maharashtra Groundwater Measurement Data 2023",
+      "region_meta": {
+        "state": "Maharashtra",
+        "year": 2023,
+        "data_type": "groundwater_measurements",
+        "file_format": "xlsx",
+        "source": "CGWB Maharashtra"
+      }
+    },
+    {
+      "url": "https://example.com/rajasthan-well-survey-data.xlsx", 
+      "title": "Rajasthan Well Survey and Water Quality Data",
+      "region_meta": {
+        "state": "Rajasthan",
+        "year": 2023,
+        "data_type": "well_survey_quality",
+        "file_format": "xlsx",
+        "source": "Rajasthan Water Board"
+      }
+    },
+    {
+      "local_path": "./data/gujarat-irrigation-data.xlsx",
+      "title": "Gujarat Irrigation and Groundwater Usage Statistics",
+      "region_meta": {
+        "state": "Gujarat",
+        "year": 2023,
+        "data_type": "irrigation_usage",
+        "file_format": "xlsx",
+        "source": "Gujarat Agriculture Department"
+      }
+    },
+    {
+      "url": "https://example.com/national-aquifer-data.xlsx",
+      "title": "National Aquifer Mapping Data India 2023", 
+      "region_meta": {
+        "scope": "national",
+        "year": 2023,
+        "data_type": "aquifer_mapping",
+        "file_format": "xlsx",
+        "source": "Ministry of Water Resources",
+        "priority": "high"
+      }
+    },
+    {
+      "local_path": "./data/punjab-water-crisis-statistics.xlsx",
+      "title": "Punjab Water Crisis - Statistical Analysis",
+      "region_meta": {
+        "state": "Punjab", 
+        "year": 2023,
+        "data_type": "crisis_statistics",
+        "file_format": "xlsx",
+        "source": "Punjab Agriculture University",
+        "urgency": "critical"
+      }
+    }
+  ],
+  "settings": {
+    "description": "Configuration file for Excel (.xlsx) ingestion into SIH INGRES RAG system",
+    "version": "1.0",
+    "created_date": "2025-09-04",
+    "supported_formats": [".xlsx", ".xls"],
+    "features": [
+      "Extracts data from all sheets in Excel file",
+      "Converts tabular data to searchable text",
+      "Preserves column names and relationships",
+      "Handles both online URLs and local files",
+      "Includes summary statistics for numeric data"
+    ],
+    "instructions": [
+      "Replace example URLs with your actual Excel file URLs",
+      "For local files, use 'local_path' instead of 'url'",
+      "Update titles and region_meta with accurate information", 
+      "Ensure URLs are publicly accessible or files exist locally",
+      "Install required packages: pip install pandas openpyxl",
+      "Run: python ingest_excel_files.py"
+    ],
+    "metadata_fields": {
+      "state": "Indian state name",
+      "year": "Data collection year", 
+      "data_type": "Type of groundwater data",
+      "source": "Organization that collected the data",
+      "priority": "Data importance level",
+      "coverage": "Geographic coverage level"
+    }
+  }
+}

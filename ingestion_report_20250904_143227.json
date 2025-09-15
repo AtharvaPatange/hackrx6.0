@@ -1,0 +1,25 @@
+{
+  "ingestion_summary": {
+    "timestamp": "2025-09-04T14:32:27.517246",
+    "total_documents": 2,
+    "successful_documents": 0,
+    "failed_documents": 2,
+    "total_chunks": 0,
+    "total_characters": 0
+  },
+  "successful_documents": [],
+  "failed_documents": [
+    {
+      "title": "Groundwater Methodology and Indicators - UN Report",
+      "url": "https://www.un.org/esa/sustdev/natlinfo/indicators/methodology_sheets/freshwater/groundwater.pdf",
+      "error": "HTTP 400: {\"detail\":\"Failed to fetch URL: 403 Client Error: Forbidden for url: https://www.un.org/esa/sustdev/natlinfo/indicators/methodology_sheets/freshwater/groundwater.pdf\"}",
+      "failed_at": "2025-09-04T14:32:21.112185"
+    },
+    {
+      "title": "India Groundwater Critical Assessment - World Bank Report",
+      "url": "https://www.worldbank.org/content/dam/Worldbank/document/SAR/india/India-Groundwater-Critical-Assessment-Draft.pdf",
+      "error": "HTTP 400: {\"detail\":\"Failed to fetch URL: 404 Client Error: Not Found for url: https://www.worldbank.org/content/dam/Worldbank/document/SAR/india/India-Groundwater-Critical-Assessment-Draft.pdf\"}",
+      "failed_at": "2025-09-04T14:32:27.511246"
+    }
+  ]
+}

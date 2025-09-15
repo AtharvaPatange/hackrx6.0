@@ -1,0 +1,40 @@
+{
+  "documents": [
+    {
+      "url": "https://www.un.org/esa/sustdev/natlinfo/indicators/methodology_sheets/freshwater/groundwater.pdf",
+      "title": "Groundwater Methodology and Indicators - UN Report",
+      "region_meta": {
+        "state": "Global",
+        "year": 2020,
+        "report_type": "methodology_guidelines",
+        "agency": "UN",
+        "language": "English",
+        "coverage": "global_standards"
+      }
+    },
+    {
+      "url": "https://www.worldbank.org/content/dam/Worldbank/document/SAR/india/India-Groundwater-Critical-Assessment-Draft.pdf",
+      "title": "India Groundwater Critical Assessment - World Bank Report",
+      "region_meta": {
+        "state": "All States",
+        "year": 2018,
+        "report_type": "critical_assessment",
+        "agency": "World Bank",
+        "language": "English", 
+        "coverage": "national_level"
+      }
+    }
+  ],
+  "ingestion_settings": {
+    "description": "Configuration file for bulk PDF ingestion into SIH INGRES RAG system",
+    "version": "1.0",
+    "created_date": "2025-09-04",
+    "instructions": [
+      "Replace example URLs with your actual PDF URLs",
+      "Update titles and region_meta with accurate information",
+      "Ensure all PDF URLs are publicly accessible",
+      "Add more documents as needed",
+      "Run: python bulk_ingest_pdfs.py"
+    ]
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "documents": [
+    {
+      "title": "Test Groundwater Document",
+      "text": "Groundwater is water that exists underground in aquifers beneath the water table. In India, groundwater is crucial for irrigation, domestic water supply, and industrial use. The Central Ground Water Board (CGWB) is responsible for monitoring and managing groundwater resources across the country. India has abundant groundwater resources, but over-extraction in many regions has led to declining water tables. Agricultural activities consume about 89% of groundwater in India. States like Punjab, Haryana, and Tamil Nadu face severe groundwater depletion. The government has implemented various schemes like the Atal Bhujal Yojana to promote sustainable groundwater management. Rainwater harvesting and artificial recharge are key strategies for groundwater conservation. Quality issues include contamination from industrial waste, pesticides, and naturally occurring elements like arsenic and fluoride. Regular monitoring of groundwater levels and quality is essential for sustainable water resource management in India.",
+      "region_meta": {
+        "state": "Pan India",
+        "year": 2024,
+        "report_type": "educational",
+        "agency": "Test",
+        "language": "English",
+        "coverage": "national_level"
+      }
+    }
+  ],
+  "ingestion_settings": {
+    "description": "Test configuration for direct text ingestion",
+    "version": "1.0",
+    "created_date": "2025-09-04"
+  }
+}

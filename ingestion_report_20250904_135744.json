@@ -1,0 +1,25 @@
+{
+  "ingestion_summary": {
+    "timestamp": "2025-09-04T13:57:44.766247",
+    "total_documents": 2,
+    "successful_documents": 0,
+    "failed_documents": 2,
+    "total_chunks": 0,
+    "total_characters": 0
+  },
+  "successful_documents": [],
+  "failed_documents": [
+    {
+      "title": "DYNAMIC GROUND WATER RESOURCES OF INDIA (As on 31st March 2011)",
+      "url": "https://drive.google.com/file/d/1IaK1TdBZXoE-YhWISK-H7I9N6M1xwrQf/view?usp=drivesdk",
+      "error": "HTTP 500: {\"detail\":\"Vector upsert failed: 500: Embedding generation failed: 400 Client Error: Bad Request for url: https://api.jina.ai/v1/embeddings\"}",
+      "failed_at": "2025-09-04T13:57:32.137785"
+    },
+    {
+      "title": "Groundwater Measurement Data of Arunachal Assam Chhattisgarh Gujarat Daman and diu Daman and Daman Dadra and Dadra Nagar Haveli Jharkhand Haryana Jammu and kashmir Ladakh Lakshadweep Manipur Meghalaya Mizoram Nagaland Puducherry Punjab Rajasthan Tamil Nadu Telegana Tripura Uttarakhand",
+      "url": "https://docs.google.com/spreadsheets/d/11erfPQV6dk1eUE3VFpvWbSLti5n7UVs9/edit?usp=sharing&ouid=116169872970163175742&rtpof=true&sd=true",
+      "error": "HTTP 500: {\"detail\":\"Vector upsert failed: 500: Embedding generation failed: 400 Client Error: Bad Request for url: https://api.jina.ai/v1/embeddings\"}",
+      "failed_at": "2025-09-04T13:57:44.759810"
+    }
+  ]
+}
