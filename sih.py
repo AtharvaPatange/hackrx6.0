@@ -49,6 +49,9 @@ print(f"   - Vector Dimension: {VECTOR_DIM}")
 # ---------- Initialize clients ----------
 print("🚀 Initializing clients...")
 
+# In-memory cache for full text content (since Pinecone metadata is limited)
+text_cache = {}
+
 # Initialize Groq client
 groq_client = Groq(api_key=GROQ_API_KEY)
 print("✅ Groq client initialized")
@@ -189,7 +192,7 @@ def call_groq_llm(prompt: str, max_tokens: int = 512, temperature: float = 0.0) 
     try:
         chat_completion = groq_client.chat.completions.create(
             messages=[
-                {"role": "system", "content": "You are an expert assistant for India groundwater resources (INGRES). Use only the provided context to answer questions accurately. If information is not available, state so clearly."},
+                {"role": "system", "content": "Answer precisely using only the provided context. Be concise and direct. Include exact data when available."},
                 {"role": "user", "content": prompt}
             ],
             model=LLM_MODEL,
@@ -206,8 +209,8 @@ def upsert_chunks_to_pinecone(chunks: List[Dict[str, Any]]):
     try:
         vectors_to_upsert = []
         
-        # Process in batches for efficiency
-        batch_size = 10
+        # Process in smaller batches to avoid message size limits
+        batch_size = 5  # Reduced from 10 to prevent 4MB message limit
         for i in range(0, len(chunks), batch_size):
             batch = chunks[i:i+batch_size]
             texts = [chunk["text"] for chunk in batch]
@@ -217,14 +220,39 @@ def upsert_chunks_to_pinecone(chunks: List[Dict[str, Any]]):
             
             # Prepare vectors for upsert
             for j, chunk in enumerate(batch):
+                # Limit text in metadata to prevent size issues (Pinecone limit: 40KB)
+                chunk_text = chunk["text"]
+                preview_text = chunk_text[:500] + "..." if len(chunk_text) > 500 else chunk_text
+                
+                # Create minimal metadata
+                chunk_metadata = chunk.get("metadata", {})
+                safe_metadata = {
+                    'text': preview_text,  # Only store preview
+                    'text_length': len(chunk_text),  # Store full length
+                    'doc_id': str(chunk_metadata.get('doc_id', ''))[:50],
+                    'title': str(chunk_metadata.get('title', ''))[:100],  # Limit title
+                    'chunk_index': chunk_metadata.get('chunk_index', 0),
+                    'created_at': chunk_metadata.get('created_at', time.time())
+                }
+                
+                # Add only essential region metadata with size limits
+                for key, value in chunk_metadata.items():
+                    if key.startswith('region_') and len(safe_metadata) < 15:  # Limit total fields
+                        essential_keys = ['region_year', 'region_agency', 'region_document', 'region_report_type']
+                        if key in essential_keys:
+                            if isinstance(value, str):
+                                safe_metadata[key] = str(value)[:30]  # Very short strings
+                            elif isinstance(value, (int, float)):
+                                safe_metadata[key] = value
+                
                 vectors_to_upsert.append({
                     'id': chunk["id"],
                     'values': embeddings[j],
-                    'metadata': {
-                        'text': chunk["text"],
-                        **chunk.get("metadata", {})
-                    }
+                    'metadata': safe_metadata
                 })
+                
+                # Store full text in a local cache for retrieval
+                text_cache[chunk["id"]] = chunk_text
         
         # Upsert to Pinecone
         if vectors_to_upsert:
@@ -249,11 +277,15 @@ def query_pinecone(vector: List[float], k: int = 6, filters: Optional[Dict[str, 
         # Format results
         matches = []
         for match in query_response.get("matches", []):
+            match_id = match["id"]
+            # Get full text from cache, fallback to metadata preview
+            full_text = text_cache.get(match_id, match.get("metadata", {}).get("text", ""))
+            
             matches.append({
-                "id": match["id"], 
+                "id": match_id, 
                 "score": match["score"], 
                 "metadata": match.get("metadata", {}),
-                "text": match.get("metadata", {}).get("text", "")
+                "text": full_text
             })
         return matches
         
@@ -438,34 +470,29 @@ async def query(req: QueryRequest, background_tasks: BackgroundTasks, _: bool = 
         context_text = "\n\n---\n\n".join(context_parts)
 
         # 5. Build prompt for LLM
-        system_context = """You are INGRES, an expert AI assistant specializing in India's groundwater resources and water management. 
+        system_context = """You are INGRES, a precise AI assistant for India's groundwater resources.
 
-Your expertise includes:
-- Groundwater levels, quality, and availability across Indian states
-- Water conservation techniques and policies
-- Agricultural water usage and irrigation systems
-- Government schemes and regulations related to water resources
-- Technical aspects of wells, aquifers, and water extraction
-
-Instructions:
-- Answer based ONLY on the provided context documents
-- Be specific and include relevant data, numbers, and location details when available
-- If information is not available in the context, clearly state this
-- Provide practical, actionable insights when possible
-- Use clear, professional language suitable for water resource professionals"""
+RESPONSE RULES:
+- Answer ONLY what is asked - no extra information
+- Use ONLY the provided context documents
+- Be direct and concise - avoid lengthy explanations
+- Include specific numbers, data, and locations when available
+- If information is not in context, state "Information not available in provided documents"
+- No introductory phrases or conclusions
+- Focus strictly on the query"""
 
         user_prompt = f"""Context Documents:
 {context_text}
 
 Question: {user_query}
 
-Please provide a comprehensive answer based on the context documents above. Include specific details, numbers, and actionable insights where available."""
+Answer the question directly using only the context above. Be concise and include exact details."""
 
         # 6. Generate answer using Groq
         print("🤖 Generating answer with Groq LLM...")
         answer = call_groq_llm(
             prompt=f"{system_context}\n\n{user_prompt}",
-            max_tokens=800,
+            max_tokens=600,
             temperature=0.1
         )
 
