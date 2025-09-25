@@ -62,47 +62,45 @@ def clean_extracted_text(text):
     
     return result.strip()
 
-def download_and_extract_groundwater_doc():
-    """Download and extract text from the groundwater document"""
+def extract_from_local_file(file_path=r"D:\HackrX\Ground Water Formula related doc.pdf"):
+    """Extract text from local groundwater document"""
     
-    url = "https://drive.google.com/uc?export=download&id=1IaK1TdBZXoE-YhWISK-H7I9N6M1xwrQf"
+    print(f"📄 Processing local file: {file_path}")
     
-    print("📥 Downloading groundwater document...")
-    
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-    }
-    
-    response = requests.get(url, headers=headers, timeout=60)
-    
-    if response.status_code != 200:
-        print(f"❌ Download failed: {response.status_code}")
+    # Check if file exists
+    import os
+    if not os.path.exists(file_path):
+        print(f"❌ File not found: {file_path}")
+        print("💡 Please download the file first:")
+        print("   1. Convert Drive URL to direct download")
+        print("   2. Save as ./data/groundwater_report.pdf")
         return None
     
-    print(f"✅ Downloaded {len(response.content):,} bytes")
+    file_size = os.path.getsize(file_path)
+    print(f"✅ Found file: {file_size:,} bytes")
     
     # Extract text from PDF
     print("📄 Extracting text from PDF...")
     
     try:
-        pdf_file = io.BytesIO(response.content)
-        pdf_reader = PyPDF2.PdfReader(pdf_file)
-        
-        raw_text = ""
-        total_pages = len(pdf_reader.pages)
-        
-        for page_num, page in enumerate(pdf_reader.pages, 1):
-            try:
-                page_text = page.extract_text()
-                if page_text:
-                    raw_text += f"\n\n--- Page {page_num} ---\n\n{page_text}"
-                    
-                if page_num % 50 == 0:
-                    print(f"   Processed {page_num}/{total_pages} pages...")
-                    
-            except Exception as e:
-                print(f"   ⚠️  Error on page {page_num}: {e}")
-                continue
+        with open(file_path, 'rb') as file:
+            pdf_reader = PyPDF2.PdfReader(file)
+            
+            raw_text = ""
+            total_pages = len(pdf_reader.pages)
+            
+            for page_num, page in enumerate(pdf_reader.pages, 1):
+                try:
+                    page_text = page.extract_text()
+                    if page_text:
+                        raw_text += f"\n\n--- Page {page_num} ---\n\n{page_text}"
+                        
+                    if page_num % 50 == 0:
+                        print(f"   Processed {page_num}/{total_pages} pages...")
+                        
+                except Exception as e:
+                    print(f"   ⚠️  Error on page {page_num}: {e}")
+                    continue
         
         print(f"✅ Raw extraction complete: {len(raw_text):,} characters")
         
@@ -204,7 +202,7 @@ def main():
     print("=" * 60)
     
     # Extract clean text
-    clean_text = download_and_extract_groundwater_doc()
+    clean_text = extract_from_local_file("D:\\HackrX\\Ground Water Formula related doc.pdf")
     
     if clean_text:
         # Upload to SIH
