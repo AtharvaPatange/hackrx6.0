@@ -1,0 +1,110 @@
+{
+  "timestamp": "20250925_105033",
+  "base_url": "https://hackrx6-0-2-51se.onrender.com",
+  "results": {
+    "root": {
+      "status": "success",
+      "status_code": 200,
+      "response_time": "0.62s",
+      "response_size": 136,
+      "data": {
+        "status": "ok",
+        "service": "INGRES RAG Backend",
+        "version": "2.0.0",
+        "pinecone_connected": true,
+        "groq_configured": true,
+        "jina_configured": true
+      }
+    },
+    "health": {
+      "status": "success",
+      "status_code": 200,
+      "response_time": "0.31s",
+      "response_size": 199,
+      "data": {
+        "status": "ok",
+        "services": {
+          "pinecone": true,
+          "groq": true,
+          "jina": true
+        },
+        "config": {
+          "embedding_model": "jina-embeddings-v2-base-en",
+          "llm_model": "llama-3.3-70b-versatile",
+          "vector_dim": 768,
+          "default_top_k": 6
+        }
+      }
+    },
+    "query": {
+      "status": "success",
+      "status_code": 200,
+      "response_time": "4.82s",
+      "response_size": 1054,
+      "data": {
+        "query_id": "36389ff0-2f09-4012-9130-a59246c334a0",
+        "language_detected": "en",
+        "answer": "Groundwater is water located underground in aquifers.",
+        "sources": [
+          {
+            "title": "Groundwater Test",
+            "relevance_score": 0.823227942,
+            "chunk_preview": "Groundwater is water located underground in aquifers. India uses 25% of global groundwater. Punjab and Haryana have groundwater depletion issues. CGWB monitors groundwater levels across India."
+          },
+          {
+            "title": "Test Document - Groundwater Resources",
+            "relevance_score": 0.822999477,
+            "chunk_preview": "This is a simple test document about groundwater resources in India. It contains basic information for testing the embedding functionality. Groundwater is a crucial resource for agricultural and domes..."
+          },
+          {
+            "title": "Groundwater Resources of India - Test Document",
+            "relevance_score": 0.801495612,
+            "chunk_preview": "India has vast groundwater resources that are crucial for agriculture and domestic use. The Central Ground Water Board monitors groundwater levels across different states. Major groundwater-dependent ..."
+          }
+        ],
+        "total_sources": 6
+      }
+    },
+    "groundwater_query": {
+      "status": "success",
+      "status_code": 200,
+      "response_time": "4.2s",
+      "response_size": 1122,
+      "data": {
+        "query_id": "7790559f-7232-490d-8537-ae1556cd6bbc",
+        "language_detected": "en",
+        "answer": "Information not available in provided documents",
+        "sources": [
+          {
+            "title": "Test Document - Groundwater Resources",
+            "relevance_score": 0.803118587,
+            "chunk_preview": "This is a simple test document about groundwater resources in India. It contains basic information for testing the embedding functionality. Groundwater is a crucial resource for agricultural and domes..."
+          },
+          {
+            "title": "Groundwater Measurement Data - Multi-State Monitoring Report 2023",
+            "relevance_score": 0.789812088,
+            "chunk_preview": "GROUNDWATER MEASUREMENT DATA Multi-State Monitoring Report - 2023 States Covered: Arunachal Pradesh, Assam, Chhattisgarh, Gujarat, Daman and Diu, Dadra and Nagar Haveli, Jharkhand, Haryana, Jammu and ..."
+          },
+          {
+            "title": "Dynamic Groundwater Resources of India - Summary Report 2011",
+            "relevance_score": 0.789096832,
+            "chunk_preview": "DYNAMIC GROUND WATER RESOURCES OF INDIA (As on 31st March 2011) EXECUTIVE SUMMARY Groundwater is a vital natural resource that supports drinking water supply, irrigation, and industrial needs across I..."
+          }
+        ],
+        "total_sources": 6
+      }
+    },
+    "ingest": {
+      "status": "success",
+      "status_code": 200,
+      "response_time": "3.69s",
+      "response_size": 111,
+      "data": {
+        "status": "success",
+        "doc_id": "2de0ecb3-070a-4d13-91af-8d1ede0572f6",
+        "chunks_processed": 1,
+        "total_characters": 35
+      }
+    }
+  }
+}
